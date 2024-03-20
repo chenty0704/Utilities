@@ -14,11 +14,15 @@ F[template_String, args_List] := Module[{formatters},
             "D", If[NonNegative[#],
                 StringPadLeft[ToString[#], count, "0"],
                 "-" ~~ StringPadLeft[ToString[-#], count, "0"]
-            ] &
+            ] &,
+            "F", ToString@NumberForm[#, {\[Infinity], count}] &
         ]],
         Identity
     ], {format, Cases[First@StringTemplate[template], TemplateSlot[format_] :> format]}];
-    Return@TemplateApply[StringReplace[template, "`" ~~ __ ~~ "`" -> "``"], MapThread[#1[#2]&, {formatters, args}]];
+    Return@TemplateApply[
+        StringReplace[template, Shortest["`" ~~ ___ ~~ "`"] -> "``"],
+        MapThread[#1[#2]&, {formatters, args}]
+    ];
 ];
 
 ToPascalCase[value_String] := StringDelete[Capitalize[value, "AllWords"], WhitespaceCharacter];
