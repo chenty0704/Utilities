@@ -16,6 +16,7 @@ Get["Utilities`CompilerUtilities`"];
 Get["Utilities`ErrorUtilities`"];
 Get["Utilities`ListUtilities`"];
 Get["Utilities`StringUtilities`"];
+Get["Utilities`TestingUtilities`"];
 Get["Utilities`VisualizationUtilities`"];
 
 End[];
