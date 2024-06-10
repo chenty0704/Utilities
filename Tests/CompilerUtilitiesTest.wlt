@@ -1,11 +1,11 @@
 ListableMean;
-array = RandomReal[{0, 1}, {1000, 1000, 1000}];
-compiledResult = AbsoluteTiming@ListableMean[array];
-uncompiledResult = AbsoluteTiming@ArrayReduce[Mean, array, 3];
-VerificationTest[Last[compiledResult], Last[uncompiledResult]];
-VerificationTest[First[compiledResult] < First[uncompiledResult]];
+values = RandomReal[{0, 1}, {1000, 1000, 1000}];
+compiledResult = AbsoluteTiming@ListableMean[values];
+builtinResult = AbsoluteTiming@ArrayReduce[Mean, values, 3];
+VerificationTest[Last[compiledResult], Last[builtinResult]];
+VerificationTest[First[compiledResult] < First[builtinResult]];
 
-array1 = RandomReal[{0, 1}, {1000, 1000}];
-array2 = RandomReal[{0, 1}, {1000, 1000}];
-VerificationTest[Mean@Abs[ListableCorrelation[array1, array2] -
-        MapThread[Correlation, {array1, array2}]] < $MachineEpsilon]
+values1 = RandomReal[{0, 1}, {1000, 1000}];
+values2 = RandomReal[{0, 1}, {1000, 1000}];
+VerificationTest[Mean@Abs[ListableCorrelation[values1, values2] -
+        MapThread[Correlation, {values1, values2}]] < $MachineEpsilon]
