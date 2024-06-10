@@ -10,9 +10,8 @@ SetPlotTheme::usage = UsageString@"SetPlotTheme[`theme`] sets the default plot t
 
 ShowLegend::usage = UsageString@"ShowLegend[`legend`, `options`] shows a legend with the specified options added.";
 
-ShowLegended::usage = UsageString@"ShowLegended[`graphics`, `options`] shows legended graphics with the specified options added.";
-
-ShowPhysicalSize::usage = UsageString@"ShowPhysicalSize[`expr`] displays graphics at physical size.";
+ShowPhysicalSize::usage = UsageString@"ShowPhysicalSize[`expr`] displays graphics at physical size.
+ShowPhysicalSize[`expr`, `zoom`] displays graphics at zoomed physical size.";
 
 ImageScalingFactors::usage = UsageString@"ImageScalingFactors[`expr`] gives the scaling factors of the displayed form of `expr` due to additional visual elements.";
 
@@ -29,8 +28,9 @@ plotSymbols = {ArrayPlot, ContourPlot, DensityPlot, DiscretePlot, ListContourPlo
 legendSymbols = Symbol /@ Names["System`*Legend"];
 
 themeLabelStyles = <|
-    "Web" -> Sequence[FontFamily -> "DIN 2014", Black],
-    "Scientific" -> Sequence[FontFamily -> "Times", Black]
+    "ACM" -> Sequence[FontFamily -> "Linux Libertine O", Black],
+    "Scientific" -> Sequence[FontFamily -> "Cambria Math", Black],
+    "Web" -> Sequence[FontFamily -> "DIN 2014", Black]
 |>;
 
 SetPlotTheme[theme_String] := (
@@ -42,19 +42,9 @@ SetPlotTheme[theme_String] := (
 ShowLegend[legend_[args : Longest[Except[_ -> _]..], legendOptions___], options__] :=
         legend[args, Join[FilterRules[{legendOptions}, Except[Alternatives @@ Keys[options]]], {options}]];
 
-ShowLegended[Legended[expr_, legend_], options__] := Legended[
-    Show[expr, Sequence @@ FilterRules[{options}, Except[PlotLegends]]],
-    ShowLegend[legend, Sequence @@ FirstCase[{options}, (PlotLegends -> legendOptions_) :> legendOptions]]
-];
+ShowPhysicalSize[expr_] := ShowPhysicalSize[expr, 1.];
 
-ShowLegended[Legended[expr_, Placed[legend_, placedArgs__]], options__] := Legended[
-    Show[expr, Sequence @@ FilterRules[{options}, Except[PlotLegends]]],
-    Placed[ShowLegend[
-        legend, Sequence @@ FirstCase[{options}, (PlotLegends -> legendOptions_) :> legendOptions]
-    ], placedArgs]
-];
-
-ShowPhysicalSize[expr_] := Magnify[expr, 1 / (Magnification /. Options[$FrontEnd])];
+ShowPhysicalSize[expr_, zoom_Real] := Magnify[expr, zoom / (Magnification /. Options[$FrontEnd])];
 
 ImageScalingFactors[expr_] := Divide @@ (Rasterize[#, "RasterSize"] & /@ {expr, First[expr]});
 

@@ -1,6 +1,6 @@
 BeginPackage["Utilities`", {"HypothesisTesting`"}];
 
-AroundMeanCI::usage = UsageString@"AroundMeanCI[`list`] gives the population mean estimated from `list` with the confidence interval.";
+AroundMeanCI::usage = UsageString@"AroundMeanCI[`values`] gives the population mean estimated from `values` with the confidence interval.";
 
 Begin["`Private`"];
 
