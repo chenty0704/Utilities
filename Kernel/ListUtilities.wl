@@ -1,8 +1,15 @@
 BeginPackage["Utilities`"];
 
+ListableMin;
+ListableMax;
+
 PartitionInto::usage = UsageString@"PartitionInto[`list`, `n`] partitions `list` into `n` sublists of equal length.";
 
 Begin["`Private`"];
+
+ListableMin[values_List, scalar : _Integer | _Real] := values - Ramp[values - scalar];
+
+ListableMax[values_List, scalar : _Integer | _Real] := values + Ramp[scalar - values];
 
 Options[PartitionInto] = {"StrictMode" -> False};
 
