@@ -3,13 +3,18 @@ BeginPackage["Utilities`", {"CCompilerDriver`"}];
 CompileListable::usage = UsageString@"CompileListable[`fun`, `type`] creates a compiled function that automatically threads over lists.
 CompileListable[`fun`, `type_1`, `type_2`, \[Ellipsis]] creates a compiled function with multiple arguments that automatically threads over lists.";
 
+ListablePlus;
+ListableMinus;
+ListableTimes;
+ListableDivide;
+
 ListableMean;
 ListableStandardDeviation;
 ListableCorrelation;
 
 Begin["`Private`"];
 
-vsWhere = FileNameJoin@{Environment["ProgramFiles(x86)"], "Microsoft Visual Studio", "Installer", "vswhere.exe"};
+vsWhere = FileNameJoin[Environment["ProgramFiles(x86)"], "Microsoft Visual Studio", "Installer", "vswhere.exe"];
 $CCompiler = {
     "Compiler" -> CCompilerDriver`VisualStudioCompiler`VisualStudioCompiler,
     "CompilerInstallation" -> StringTrim@RunProcess[
@@ -45,6 +50,35 @@ CompileListable[fun_, type1 : typePattern, type2 : typePattern, type3 : typePatt
         {{arg1, spec1, rank1}, {arg2, spec2, rank2}, {arg3, spec3, rank3}},
         fun[arg1, arg2, arg3], Evaluate[listableCompilationOptions]
     ]
+];
+
+ListablePlusImpl[type_, rank_] := ListablePlusImpl[type, rank] = CompileListable[Plus, {type, rank}, {type, rank}];
+ListableMinusImpl[type_, rank_] := ListableMinusImpl[type, rank] = CompileListable[Minus, {type, rank}, {type, rank}];
+ListableTimesImpl[type_, rank_] := ListableTimesImpl[type, rank] = CompileListable[Times, {type, rank}, {type, rank}];
+ListableDivideImpl[type_, rank_] := ListableDivideImpl[type, rank] = CompileListable[Divide, {type, rank}, {type, rank}];
+
+ListablePlus[values1_List, values2_List] := With[{
+    type = If[ArrayQ[values1, _, IntegerQ], Integer, Real],
+    rank = Min[ArrayDepth[values1], ArrayDepth[values2]]},
+    ListablePlusImpl[type, rank][values1, values2]
+];
+
+ListableMinus[values1_List, values2_List] := With[{
+    type = If[ArrayQ[values1, _, IntegerQ], Integer, Real],
+    rank = Min[ArrayDepth[values1], ArrayDepth[values2]]},
+    ListableMinusImpl[type, rank][values1, values2]
+];
+
+ListableTimes[values1_List, values2_List] := With[{
+    type = If[ArrayQ[values1, _, IntegerQ], Integer, Real],
+    rank = Min[ArrayDepth[values1], ArrayDepth[values2]]},
+    ListableTimesImpl[type, rank][values1, values2]
+];
+
+ListableDivide[values1_List, values2_List] := With[{
+    type = If[ArrayQ[values1, _, IntegerQ], Integer, Real],
+    rank = Min[ArrayDepth[values1], ArrayDepth[values2]]},
+    ListableDivideImpl[type, rank][values1, values2]
 ];
 
 ListableMean := ListableMean = CompileListable[Mean, {Real, 1}];
