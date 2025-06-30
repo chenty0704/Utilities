@@ -2,7 +2,7 @@ BeginPackage["Utilities`"];
 
 Inch::usage = UsageString@"Inch gives the number of printer's points in one inch.";
 
-DefaultColorFunction::usage = UsageString@"DefaultColorFunction[`n`] gives the `n^th` default color.";
+DefaultMatrixPlotColorFunction::usage = UsageString@"DefaultMatrixPlotColorFunction gives the default color function for matrix plots.";
 
 $LinePlotSymbols::usage = UsageString@"$LinePlotSymbols gives the list of line plot symbols.";
 $MeshPlotSymbols::usage = UsageString@"$MeshPlotSymbols gives the list of mesh plot symbols.";
@@ -15,15 +15,16 @@ SetPlotTheme::usage = UsageString@"SetPlotTheme[`theme`] sets the default plot t
 
 ShowLegend::usage = UsageString@"ShowLegend[`legend`, `options`] shows a legend with the specified options added.";
 
-ShowPhysicalSize::usage = UsageString@"ShowPhysicalSize[`expr`] displays graphics at physical size.
-ShowPhysicalSize[`expr`, `zoom`] displays graphics at zoomed physical size.";
+DisplayPhysicalSize::usage = UsageString@"DisplayPhysicalSize[`expr`] displays graphics at physical size.";
+
+RasterWidth::usage = UsageString@"RasterWidth[`expr`] gives the width of the rasterized form of `expr`.";
 
 Begin["`Private`"];
 
 Attributes[Inch] = {Constant};
 Inch = 72.;
 
-DefaultColorFunction = ColorData[97];
+DefaultMatrixPlotColorFunction = Blend[System`PlotThemeDump`$ThemeDefaultMatrix, #] &;
 
 $LinePlotSymbols = {DiscretePlot, ListLinePlot, ListLogLinearPlot, ListLogLogPlot, ListLogPlot, ListPlot, ListPolarPlot, ListStepPlot, LogLinearPlot, LogPlot, ParametricPlot, Plot, PolarPlot};
 $MeshPlotSymbols = {ArrayPlot, ContourPlot, DensityPlot, ListContourPlot, ListDensityPlot, MatrixPlot};
@@ -31,25 +32,27 @@ $ChartSymbols = Symbol /@ Names["System`*Chart"];
 $LegendSymbols = Symbol /@ Names["System`*Legend"];
 
 themeLabelStyles = <|
-    "ACM" -> Sequence[FontFamily -> "Linux Libertine O", Black],
-    "Default" -> Sequence[FontFamily -> "Source Sans Pro", Black],
-    "Office" -> Sequence[FontFamily -> "Aptos", Black],
-    "Quip" -> Sequence[FontFamily -> "Neue Haas Grotesk Text Pro", Black]
+    "ACM" -> {FontFamily -> "Linux Libertine O", Black},
+    "Default" -> {FontFamily -> "Source Sans Pro", Black},
+    "Office" -> {FontFamily -> "Aptos", Black},
+    "Quip" -> {FontFamily -> "Helvetica Neue", FontWeight -> "Light", Black},
+    "Scientific" -> {FontFamily -> "Cambria", Black}
 |>;
 
 SetPlotTheme[theme_String] := (
     $ThemeLabelStyle = themeLabelStyles[theme];
-    Do[SetOptions[symbol, Frame -> True, LabelStyle -> {$ThemeLabelStyle}],
+    Do[SetOptions[symbol, Frame -> True, LabelStyle -> $ThemeLabelStyle],
         {symbol, Join[$LinePlotSymbols, $MeshPlotSymbols, $ChartSymbols]}];
-    Do[SetOptions[symbol, LabelStyle -> {$ThemeLabelStyle}], {symbol, $LegendSymbols}];
+    Do[SetOptions[symbol, LabelStyle -> $ThemeLabelStyle], {symbol, $LegendSymbols}];
+    SetOptions[Labeled, LabelStyle -> $ThemeLabelStyle];
 );
 
 ShowLegend[legend_[args : Longest[Except[_ -> _]..], legendOptions___], options__] :=
         legend[args, Sequence @@ Join[FilterRules[{legendOptions}, Except[Alternatives @@ Keys@{options}]], {options}]];
 
-ShowPhysicalSize[expr_] := ShowPhysicalSize[expr, 1.];
+DisplayPhysicalSize[expr_] := Magnify[expr, 1 / (Magnification /. Options[$FrontEnd])];
 
-ShowPhysicalSize[expr_, zoom_Real] := Magnify[expr, zoom / (Magnification /. Options[$FrontEnd])];
+RasterWidth[expr_] := First@Rasterize[expr, "RasterSize", ImageResolution -> 72];
 
 End[];
 
