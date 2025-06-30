@@ -14,12 +14,14 @@ ListableCorrelation;
 
 Begin["`Private`"];
 
-vsWhere = FileNameJoin[Environment["ProgramFiles(x86)"], "Microsoft Visual Studio", "Installer", "vswhere.exe"];
-$CCompiler = {
-    "Compiler" -> CCompilerDriver`VisualStudioCompiler`VisualStudioCompiler,
-    "CompilerInstallation" -> StringTrim@RunProcess[
-        {vsWhere, "-latest", "-prerelease", "-property", "installationPath"}, "StandardOutput"]
-};
+If[$OperatingSystem == "Windows",
+    vsWhere = FileNameJoin[Environment["ProgramFiles(x86)"], "Microsoft Visual Studio", "Installer", "vswhere.exe"];
+    $CCompiler = {
+        "Compiler" -> CCompilerDriver`VisualStudioCompiler`VisualStudioCompiler,
+        "CompilerInstallation" -> StringTrim@RunProcess[
+            {vsWhere, "-latest", "-prerelease", "-property", "installationPath"}, "StandardOutput"]
+    };
+];
 
 typePattern = _Symbol | {_Symbol, _Integer};
 
