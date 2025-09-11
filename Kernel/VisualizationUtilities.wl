@@ -13,9 +13,9 @@ $ThemeLabelStyle::usage = UsageString@"$ThemeLabelStyle gives the label style of
 
 SetPlotTheme::usage = UsageString@"SetPlotTheme[`theme`] sets the default plot theme for graphics functions.";
 
-ShowLegend::usage = UsageString@"ShowLegend[`legend`, `options`] shows a legend with the specified options added.";
+ShowLegend::usage = UsageString@"ShowLegend[`legend`, `options`] shows `legend` with the specified options added.";
 
-DisplayPhysicalSize::usage = UsageString@"DisplayPhysicalSize[`expr`] displays graphics at physical size.";
+DisplayAtPhysicalSize::usage = UsageString@"DisplayAtPhysicalSize[`expr`] displays `expr` at physical size.";
 
 RasterWidth::usage = UsageString@"RasterWidth[`expr`] gives the width of the rasterized form of `expr`.";
 
@@ -28,14 +28,13 @@ DefaultMatrixPlotColorFunction = Blend[System`PlotThemeDump`$ThemeDefaultMatrix,
 
 $LinePlotSymbols = {DiscretePlot, ListLinePlot, ListLogLinearPlot, ListLogLogPlot, ListLogPlot, ListPlot, ListPolarPlot, ListStepPlot, LogLinearPlot, LogPlot, ParametricPlot, Plot, PolarPlot};
 $MeshPlotSymbols = {ArrayPlot, ContourPlot, DensityPlot, ListContourPlot, ListDensityPlot, MatrixPlot};
-$ChartSymbols = Symbol /@ Names["System`*Chart"];
+$ChartSymbols = Join[Symbol /@ Names["System`*Chart"], {Histogram, SmoothHistogram}];
 $LegendSymbols = Symbol /@ Names["System`*Legend"];
 
 themeLabelStyles = <|
     "ACM" -> {FontFamily -> "Linux Libertine O", Black},
     "Default" -> {FontFamily -> "Source Sans Pro", Black},
     "Office" -> {FontFamily -> "Aptos", Black},
-    "Quip" -> {FontFamily -> "Helvetica Neue", FontWeight -> "Light", Black},
     "Scientific" -> {FontFamily -> "Cambria", Black}
 |>;
 
@@ -47,12 +46,12 @@ SetPlotTheme[theme_String] := (
     SetOptions[Labeled, LabelStyle -> $ThemeLabelStyle];
 );
 
-ShowLegend[legend_[args : Longest[Except[_ -> _]..], legendOptions___], options__] :=
-        legend[args, Sequence @@ Join[FilterRules[{legendOptions}, Except[Alternatives @@ Keys@{options}]], {options}]];
+ShowLegend[legend_[args : Longest[Except[_ -> _]..], legendOpts___], options__] :=
+        legend[args, Sequence @@ Join[FilterRules[{legendOpts}, Except[Alternatives @@ Keys@{options}]], {options}]];
 
-DisplayPhysicalSize[expr_] := Magnify[expr, 1 / (Magnification /. Options[$FrontEnd])];
+DisplayAtPhysicalSize[expr_] := Magnify[expr, 1 / (Magnification /. Options[$FrontEnd])];
 
-RasterWidth[expr_] := First@Rasterize[expr, "RasterSize", ImageResolution -> 72];
+RasterWidth[expr_] := Rasterize[expr, "RasterSize", ImageResolution -> 72][[1]];
 
 End[];
 
