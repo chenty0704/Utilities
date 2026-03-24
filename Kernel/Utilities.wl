@@ -17,6 +17,7 @@ Get["Utilities`ErrorUtilities`"];
 Get["Utilities`ListUtilities`"];
 Get["Utilities`StatisticsUtilities`"];
 Get["Utilities`StringUtilities`"];
+Get["Utilities`TimeSeriesUtilities`"];
 Get["Utilities`VisualizationUtilities`"];
 
 End[];
